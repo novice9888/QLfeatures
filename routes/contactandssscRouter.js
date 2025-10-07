@@ -1,6 +1,11 @@
 const express = require('express');
 const request = require('request');
-const { clientId, clientSecret, merchantId, countryCode,currencyCode } = require('../config');
+//const { clientId, clientSecret, merchantId, countryCode,currencyCode } = require('../config');
+const  clientId = 'AahjB-LVy2RIYmf0Sc4UhQGukQJ5VfaO77cdsAszeCXhttAbpr9Zc-g7fLFefIIDq-k7KsL5877dekEB';
+const clientSecret ='EIB_cenVzy9IP00hLFPBMhw-al-8J7Jm1cGNaZNkmuQLS3zI-HfoNGy33-8vdfbqZnvIm9cihCFQmyCH';
+const merchantId ='YDHLALG3QWAES';
+const countryCode ='US';
+  const currencyCode  = 'USD';
 
 const router = express.Router();
 

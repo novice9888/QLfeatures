@@ -4,7 +4,7 @@ const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require('body-parser');
 const cors = require ('cors');
 
-const { port  } = require('./config');
+const port = 8080;
 
 
 const indexRouter = require('./routes/index');

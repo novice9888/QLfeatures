@@ -6,22 +6,11 @@ const cors = require ('cors');
 
 const port = 8080;
 
-
-const indexRouter = require('./routes/index');
-const fastlaneComponentRouter = require('./routes/fastlaneComponent');
-const appSwitchRouter = require('./routes/appSwitchRouter');
-
-const appSwitchApiRouter = require('./routes/appSwitchApiRouter');
-const flukMerchantRouter = require('./routes/fastlaneUKMerchantRouter');
-const flMerchantUKLiveRouter = require('./routes/flmerchantukLiveRouter.js');
-
 const contactandssscRouter = require('./routes/contactandssscRouter.js')
 
 app.set('view engine', 'ejs');
 app.set('views', __dirname+ '/views');
 app.set('layout', 'layouts/layout');
-
-//dotenv.config();
 
 app.use(expressLayouts);
 app.use(express.static('public'))

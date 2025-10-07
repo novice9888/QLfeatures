@@ -1,0 +1,74 @@
+   <script
+        src="https://www.paypal.com/sdk/js?client-id=AZ73zbPwKdTxYLwvLKZYHH--AmaGEuAylnT8IbdyoeRC2VlUP_vM4TUzrVesJS2y4FL2FBkwqPaqlSCa&currency=USD&commit=true&buyer-country=US&intent=capture&components=buttons&merchant-id=YDHLALG3QWAES">
+
+        </script>
+
+<body>
+<h2>Contact and SSSC (US only at the mo -  check availability)</h2>
+
+      <div id="pp-container-shortcut"></div>
+     <div id="pp-container"></div>
+      <div id="order-status" style="display:none">  
+        <h4> Order Created </h4>
+       
+      </div>
+  
+      </div>
+      <pre id="capture-response"></pre>
+
+</body>
+    <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+   const buttons = paypal.Buttons({
+
+          fundingSource: paypal.FUNDING.PAYPAL,
+          createOrder: function (data, actions) {
+ 
+            return fetch('/contactandsssc/createOrder', {
+              method: 'POST',
+              body: JSON.stringify({
+                source: data.paymentSource, //paypal / venmo / etc.
+              }),
+
+              // Here for product info
+            }).then(function (res) {
+              return res.json();
+            }).then(function (orderData) {
+              return orderData.id;
+            });
+          },
+          // Authorize or capture the transaction after payer approves
+          onApprove: async (data, actions) => {
+
+            console.log("inside onApprove" + data);
+            try {
+              const result = await fetch(
+                "/contactandsssc/capture",
+                {
+                  method: "POST",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                  orderId: data.orderID
+                })
+                }
+              );
+              const captureResponse = await result.json();
+              console.log(captureResponse.id);
+              document.getElementById("capture-response").innerText = JSON.stringify(captureResponse, null, 4);
+              document.getElementById("pp-container").style.display = "none";
+              document.getElementById("order-status").style.display = "block";
+
+            } catch (err) {
+              console.error(err);
+            }
+          },
+          onError: function (err) {
+            console.error("An error prevented the buyer from checking out with PayPal");
+            console.error(err);
+          },
+        });
+        buttons.render("#pp-container");
+      });
+    </script>

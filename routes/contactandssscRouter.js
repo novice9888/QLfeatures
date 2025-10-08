@@ -210,13 +210,13 @@ console.log("inside contact and sssc route");
     // });
     console.log("Callback received")
     
-  } catch (error) {
-    console.error('Error processing shipping callback:', error);
-    return res.status(500).json({
-      name: 'INTERNAL_SERVER_ERROR',
-      message: 'An error occurred while processing your shipping information.'
-    });
-  }
+  // } catch (error) {
+  //   console.error('Error processing shipping callback:', error);
+  //   return res.status(500).json({
+  //     name: 'INTERNAL_SERVER_ERROR',
+  //     message: 'An error occurred while processing your shipping information.'
+  //   });
+  // }
 });
 
 // Validate shipping address

@@ -139,18 +139,17 @@ console.log("inside contact and sssc route");
  })
 
 
-  ////--------
   router.post('/shipping-callback', async (req, res) => {
   try {
-    const { order_id, shipping_address, shipping_option, purchase_units } = req.body;
+    const { id, shipping_address, shipping_option, purchase_units } = req.body;
     
-    console.log('Received shipping callback for order:', order_id);
+    console.log('Received shipping callback for order:', id);
     console.log('Shipping address:', shipping_address);
     
     // Extract address details
     const { country_code, admin_area_1, admin_area_2, postal_code } = shipping_address;
     
-    // Validate shipping address
+      // Validate shipping address
     const validationResult = validateShippingAddress(shipping_address);
     
     if (!validationResult.isValid) {
@@ -165,13 +164,15 @@ console.log("inside contact and sssc route");
       });
     }
     
-    // Calculate shipping options based on address
-    const shippingOptions = calculateShippingOptions(shipping_address, purchase_units);
+    // Calculate shipping options based on address (for the entire order)
+    const shippingOptions = calculateShippingOptions(shipping_address, purchase_units[0]);
+    
+    // Get the selected shipping cost (applies to entire order)
+    const selectedOption = shippingOptions.find(opt => opt.selected) || shippingOptions[0];
+    const shippingCost = selectedOption ? parseFloat(selectedOption.amount.value) : 0;
     
     // Calculate updated amounts
-    const updatedPurchaseUnits = purchase_units.map((unit, index) => {
-      const selectedOption = shippingOptions[index]?.find(opt => opt.selected) || shippingOptions[index]?.[0];
-      const shippingCost = selectedOption ? parseFloat(selectedOption.amount.value) : 0;
+    const updatedPurchaseUnits = purchase_units.map((unit) => {
       
       // Get original item total and tax
       const itemTotal = parseFloat(unit.amount.breakdown.item_total.value);
@@ -201,7 +202,7 @@ console.log("inside contact and sssc route");
           }
         },
         shipping: {
-          options: shippingOptions[index]
+          options: shippingOptions // Same options for all units
         }
       };
     });
@@ -210,7 +211,6 @@ console.log("inside contact and sssc route");
     return res.status(200).json({
       purchase_units: updatedPurchaseUnits
     });
-    console.log("Callback received")
     
   } catch (error) {
     console.error('Error processing shipping callback:', error);
@@ -221,9 +221,60 @@ console.log("inside contact and sssc route");
   }
 });
 
+
+f
+  function calculateShippingOptions(address, firstPurchaseUnit) {
+  const { country_code } = address;
+  const currencyCode = firstPurchaseUnit.amount.currency_code;
+  
+  const options = [];
+    
+  // Standard shipping
+  options.push({
+    id: 'STANDARD',
+    label: 'Standard Shipping (5-7 business days)',
+    type: 'SHIPPING',
+    selected: true, // First option is selected by default
+    amount: {
+      currency_code: currencyCode,
+      value: calculateShippingCost('STANDARD', country_code, firstPurchaseUnit)
+    }
+  });
+  
+  // Express shipping
+  options.push({
+    id: 'EXPRESS',
+    label: 'Express Shipping (2-3 business days)',
+    type: 'SHIPPING',
+    selected: false,
+    amount: {
+      currency_code: currencyCode,
+      value: calculateShippingCost('EXPRESS', country_code, firstPurchaseUnit)
+    }
+  });
+  
+  // Overnight shipping (US only)
+  if (country_code === 'US') {
+    options.push({
+      id: 'OVERNIGHT',
+      label: 'Overnight Shipping',
+      type: 'SHIPPING',
+      selected: false,
+      amount: {
+        currency_code: currencyCode,
+        value: calculateShippingCost('OVERNIGHT', country_code, firstPurchaseUnit)
+      }
+    });
+  }
+  
+  return options;
+
+}
+
 // Validate shipping address
 function validateShippingAddress(address) {
-  const { country_code, admin_area_1, postal_code } = address;
+
+   const { country_code, admin_area_1, admin_area_2, postal_code } = address;
   
   // Example: Only ship to US, Canada, and UK
   const allowedCountries = ['US', 'CA', 'GB'];
@@ -260,55 +311,6 @@ function validateShippingAddress(address) {
   return { isValid: true };
 }
 
-// Calculate shipping options based on address
-function calculateShippingOptions(address, purchaseUnits) {
-  const { country_code, admin_area_1 } = address;
-  
-  // Return shipping options for each purchase unit
-  return purchaseUnits.map((unit, index) => {
-    const options = [];
-    
-    // Standard shipping
-    options.push({
-      id: 'STANDARD',
-      label: 'Standard Shipping (5-7 business days)',
-      type: 'SHIPPING',
-      selected: true, // First option is selected by default
-      amount: {
-        currency_code: unit.amount.currency_code,
-        value: calculateShippingCost('STANDARD', country_code, unit)
-      }
-    });
-    
-    // Express shipping
-    options.push({
-      id: 'EXPRESS',
-      label: 'Express Shipping (2-3 business days)',
-      type: 'SHIPPING',
-      selected: false,
-      amount: {
-        currency_code: unit.amount.currency_code,
-        value: calculateShippingCost('EXPRESS', country_code, unit)
-      }
-    });
-    
-    // Overnight shipping (US only)
-    if (country_code === 'US') {
-      options.push({
-        id: 'OVERNIGHT',
-        label: 'Overnight Shipping',
-        type: 'SHIPPING',
-        selected: false,
-        amount: {
-          currency_code: unit.amount.currency_code,
-          value: calculateShippingCost('OVERNIGHT', country_code, unit)
-        }
-      });
-    }
-    
-    return options;
-  });
-}
 
 // Calculate shipping cost based on type and location
 function calculateShippingCost(shippingType, countryCode, purchaseUnit) {
@@ -339,5 +341,5 @@ function calculateShippingCost(shippingType, countryCode, purchaseUnit) {
   
   return rates[countryCode]?.[shippingType] || '9.99';
 }
-
+  
   module.exports = router;

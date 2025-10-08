@@ -222,7 +222,6 @@ console.log("inside contact and sssc route");
 });
 
 
-f
   function calculateShippingOptions(address, firstPurchaseUnit) {
   const { country_code } = address;
   const currencyCode = firstPurchaseUnit.amount.currency_code;

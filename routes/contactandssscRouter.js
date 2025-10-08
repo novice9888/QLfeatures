@@ -134,7 +134,9 @@ console.log("inside contact and sssc route");
     });
   });
 
-
+ router.get('/shipping-callback', async (req, res) => {
+   console.log("calling callback", res.body)
+ })
 
 
   ////--------

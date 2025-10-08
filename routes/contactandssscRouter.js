@@ -82,7 +82,7 @@ console.log("inside contact and sssc route");
                 "cancel_url": "https://example.com/cancelUrl",
                  "order_update_callback_config": {
               "callback_events": ["SHIPPING_ADDRESS", "SHIPPING_OPTIONS"],
-             "callback_url": "https://qlfeatures.onrender.com/shipping-callback"
+             "callback_url": "https://qlfeatures.onrender.com/contactandsssc/shipping-callback"
             }
             }
             }
@@ -141,84 +141,84 @@ console.log("inside contact and sssc route");
 
   ////--------
   router.post('/shipping-callback', async (req, res) => {
-  // try {
-  //   const { order_id, shipping_address, shipping_option, purchase_units } = req.body;
+  try {
+    const { order_id, shipping_address, shipping_option, purchase_units } = req.body;
     
-  //   console.log('Received shipping callback for order:', order_id);
-  //   console.log('Shipping address:', shipping_address);
+    console.log('Received shipping callback for order:', order_id);
+    console.log('Shipping address:', shipping_address);
     
-  //   // Extract address details
-  //   const { country_code, admin_area_1, admin_area_2, postal_code } = shipping_address;
+    // Extract address details
+    const { country_code, admin_area_1, admin_area_2, postal_code } = shipping_address;
     
-  //   // Validate shipping address
-  //   const validationResult = validateShippingAddress(shipping_address);
+    // Validate shipping address
+    const validationResult = validateShippingAddress(shipping_address);
     
-  //   if (!validationResult.isValid) {
-  //     // Return 422 error with appropriate reason
-  //     return res.status(422).json({
-  //       name: validationResult.errorName,
-  //       message: validationResult.errorMessage,
-  //       details: [{
-  //         issue: validationResult.errorName,
-  //         description: validationResult.errorMessage
-  //       }]
-  //     });
-  //   }
+    if (!validationResult.isValid) {
+      // Return 422 error with appropriate reason
+      return res.status(422).json({
+        name: validationResult.errorName,
+        message: validationResult.errorMessage,
+        details: [{
+          issue: validationResult.errorName,
+          description: validationResult.errorMessage
+        }]
+      });
+    }
     
-  //   // Calculate shipping options based on address
-  //   const shippingOptions = calculateShippingOptions(shipping_address, purchase_units);
+    // Calculate shipping options based on address
+    const shippingOptions = calculateShippingOptions(shipping_address, purchase_units);
     
-  //   // Calculate updated amounts
-  //   const updatedPurchaseUnits = purchase_units.map((unit, index) => {
-  //     const selectedOption = shippingOptions[index]?.find(opt => opt.selected) || shippingOptions[index]?.[0];
-  //     const shippingCost = selectedOption ? parseFloat(selectedOption.amount.value) : 0;
+    // Calculate updated amounts
+    const updatedPurchaseUnits = purchase_units.map((unit, index) => {
+      const selectedOption = shippingOptions[index]?.find(opt => opt.selected) || shippingOptions[index]?.[0];
+      const shippingCost = selectedOption ? parseFloat(selectedOption.amount.value) : 0;
       
-  //     // Get original item total and tax
-  //     const itemTotal = parseFloat(unit.amount.breakdown.item_total.value);
-  //     const taxTotal = parseFloat(unit.amount.breakdown.tax_total?.value || 0);
+      // Get original item total and tax
+      const itemTotal = parseFloat(unit.amount.breakdown.item_total.value);
+      const taxTotal = parseFloat(unit.amount.breakdown.tax_total?.value || 0);
       
-  //     // Calculate new total
-  //     const newTotal = (itemTotal + taxTotal + shippingCost).toFixed(2);
+      // Calculate new total
+      const newTotal = (itemTotal + taxTotal + shippingCost).toFixed(2);
       
-  //     return {
-  //       reference_id: unit.reference_id,
-  //       amount: {
-  //         currency_code: unit.amount.currency_code,
-  //         value: newTotal,
-  //         breakdown: {
-  //           item_total: {
-  //             currency_code: unit.amount.currency_code,
-  //             value: itemTotal.toFixed(2)
-  //           },
-  //           tax_total: {
-  //             currency_code: unit.amount.currency_code,
-  //             value: taxTotal.toFixed(2)
-  //           },
-  //           shipping: {
-  //             currency_code: unit.amount.currency_code,
-  //             value: shippingCost.toFixed(2)
-  //           }
-  //         }
-  //       },
-  //       shipping: {
-  //         options: shippingOptions[index]
-  //       }
-  //     };
-  //   });
+      return {
+        reference_id: unit.reference_id,
+        amount: {
+          currency_code: unit.amount.currency_code,
+          value: newTotal,
+          breakdown: {
+            item_total: {
+              currency_code: unit.amount.currency_code,
+              value: itemTotal.toFixed(2)
+            },
+            tax_total: {
+              currency_code: unit.amount.currency_code,
+              value: taxTotal.toFixed(2)
+            },
+            shipping: {
+              currency_code: unit.amount.currency_code,
+              value: shippingCost.toFixed(2)
+            }
+          }
+        },
+        shipping: {
+          options: shippingOptions[index]
+        }
+      };
+    });
     
-    // // Return success response with updated order
-    // return res.status(200).json({
-    //   purchase_units: updatedPurchaseUnits
-    // });
+    // Return success response with updated order
+    return res.status(200).json({
+      purchase_units: updatedPurchaseUnits
+    });
     console.log("Callback received")
     
-  // } catch (error) {
-  //   console.error('Error processing shipping callback:', error);
-  //   return res.status(500).json({
-  //     name: 'INTERNAL_SERVER_ERROR',
-  //     message: 'An error occurred while processing your shipping information.'
-  //   });
-  // }
+  } catch (error) {
+    console.error('Error processing shipping callback:', error);
+    return res.status(500).json({
+      name: 'INTERNAL_SERVER_ERROR',
+      message: 'An error occurred while processing your shipping information.'
+    });
+  }
 });
 
 // Validate shipping address

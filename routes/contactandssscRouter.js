@@ -139,7 +139,7 @@ console.log("inside contact and sssc route");
  })
 
 
- router.post('/shipping-callback', async (req, res) => {
+  router.post('/shipping-callback', async (req, res) => {
   try {
     const { id, shipping_address, shipping_option, purchase_units } = req.body;
     
@@ -175,17 +175,15 @@ console.log("inside contact and sssc route");
     const shippingCost = selectedOption ? parseFloat(selectedOption.amount.value) : 0;
     
     // Calculate updated amounts
-    const updatedPurchaseUnits = purchase_units.map((unit) => {
-      
-      // Get original item total and tax
+     const updatedPurchaseUnits = purchase_units.map((unit) => {
+      // Get original item total
       const itemTotal = parseFloat(unit.amount.breakdown.item_total.value);
       const taxTotal = parseFloat(unit.amount.breakdown.tax_total?.value || 0);
       
-      // Calculate new total
+      // Calculate new total with shipping
       const newTotal = (itemTotal + taxTotal + shippingCost).toFixed(2);
       
       return {
-        reference_id: unit.reference_id,
         amount: {
           currency_code: unit.amount.currency_code,
           value: newTotal,
@@ -194,10 +192,12 @@ console.log("inside contact and sssc route");
               currency_code: unit.amount.currency_code,
               value: itemTotal.toFixed(2)
             },
-            tax_total: {
-              currency_code: unit.amount.currency_code,
-              value: taxTotal.toFixed(2)
-            },
+            ...(taxTotal > 0 && {
+              tax_total: {
+                currency_code: unit.amount.currency_code,
+                value: taxTotal.toFixed(2)
+              }
+            }),
             shipping: {
               currency_code: unit.amount.currency_code,
               value: shippingCost.toFixed(2)
@@ -268,8 +268,7 @@ function getShippingOptions(firstPurchaseUnit){
   return options;
 }
 
-
-
+  
 // Validate shipping address
 function validateShippingAddress(address) {
 
@@ -311,7 +310,6 @@ function validateShippingAddress(address) {
 }
 
 
-// Calculate shipping cost based on type and location
 // Calculate shipping cost based on type and location
 function calculateShippingCost(shippingType, countryCode, purchaseUnit) {
   // Get item total to potentially calculate based on order value

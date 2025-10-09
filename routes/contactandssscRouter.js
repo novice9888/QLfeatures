@@ -139,12 +139,13 @@ console.log("inside contact and sssc route");
  })
 
 
-  router.post('/shipping-callback', async (req, res) => {
+ router.post('/shipping-callback', async (req, res) => {
   try {
     const { id, shipping_address, shipping_option, purchase_units } = req.body;
     
     console.log('Received shipping callback for order:', id);
     console.log('Shipping address:', shipping_address);
+     console.log('Shipping option:', shipping_option);
     
     // Extract address details
     const { country_code, admin_area_1, admin_area_2, postal_code } = shipping_address;
@@ -153,6 +154,7 @@ console.log("inside contact and sssc route");
     const validationResult = validateShippingAddress(shipping_address);
     
     if (!validationResult.isValid) {
+         console.log("is not valid address");
       // Return 422 error with appropriate reason
       return res.status(422).json({
         name: validationResult.errorName,
@@ -165,7 +167,8 @@ console.log("inside contact and sssc route");
     }
     
     // Calculate shipping options based on address (for the entire order)
-    const shippingOptions = calculateShippingOptions(shipping_address, purchase_units[0]);
+    // const shippingOptions = calculateShippingOptions(shipping_address, purchase_units[0]);
+    const shippingOptions = getShippingOptions(purchase_units[0]);
     
     // Get the selected shipping cost (applies to entire order)
     const selectedOption = shippingOptions.find(opt => opt.selected) || shippingOptions[0];
@@ -220,14 +223,10 @@ console.log("inside contact and sssc route");
     });
   }
 });
-
-
-  function calculateShippingOptions(address, firstPurchaseUnit) {
-  const { country_code } = address;
-  const currencyCode = firstPurchaseUnit.amount.currency_code;
-  
-  const options = [];
-    
+function getShippingOptions(firstPurchaseUnit){
+   const options = [];
+     const currencyCode = firstPurchaseUnit.amount.currency_code;
+      const { country_code } = firstPurchaseUnit.shipping.address;
   // Standard shipping
   options.push({
     id: 'STANDARD',
@@ -245,7 +244,7 @@ console.log("inside contact and sssc route");
     id: 'EXPRESS',
     label: 'Express Shipping (2-3 business days)',
     type: 'SHIPPING',
-    selected: false,
+    selected: true,
     amount: {
       currency_code: currencyCode,
       value: calculateShippingCost('EXPRESS', country_code, firstPurchaseUnit)
@@ -267,8 +266,9 @@ console.log("inside contact and sssc route");
   }
   
   return options;
-
 }
+
+
 
 // Validate shipping address
 function validateShippingAddress(address) {
@@ -312,9 +312,10 @@ function validateShippingAddress(address) {
 
 
 // Calculate shipping cost based on type and location
+// Calculate shipping cost based on type and location
 function calculateShippingCost(shippingType, countryCode, purchaseUnit) {
   // Get item total to potentially calculate based on order value
-  const itemTotal = parseFloat(purchaseUnit.amount.breakdown.item_total.value);
+  const itemTotal = parseFloat(purchaseUnit.amount.value);
   
   // Free shipping for orders over $50
   if (itemTotal >= 50 && shippingType === 'STANDARD') {

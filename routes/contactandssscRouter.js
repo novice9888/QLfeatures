@@ -184,7 +184,9 @@ console.log("inside contact and sssc route");
       const newTotal = (itemTotal + taxTotal + shippingCost).toFixed(2);
       
       return {
-        amount: {
+        id: merchantId,
+        purchase_units : [{
+          amount: {
           currency_code: unit.amount.currency_code,
           value: newTotal,
           breakdown: {
@@ -202,11 +204,12 @@ console.log("inside contact and sssc route");
               currency_code: unit.amount.currency_code,
               value: shippingCost.toFixed(2)
             }
-          }
-        },
-        shipping: {
-          options: shippingOptions // Same options for all units
+          
         }
+      },
+       shipping_options :  shippingOptions // Same options for all units
+      }]
+      
       };
     });
     

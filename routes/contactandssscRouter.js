@@ -76,7 +76,7 @@ console.log("inside contact and sssc route");
             "paypal": {
             "experience_context": {
                 "shipping_preference": "GET_FROM_FILE",
-                "contact_preference": "UPDATE_CONTACT_INFO",
+               
                 "user_action": "PAY_NOW",
                 "return_url": "https://example.com/returnUrl",
                 "cancel_url": "https://example.com/cancelUrl",

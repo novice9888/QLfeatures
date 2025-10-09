@@ -217,9 +217,7 @@ console.log("inside contact and sssc route");
 console.log(JSON.stringify(updatedPurchaseUnits, null, 2));
     
     // Return success response with updated order
-    return res.status(200).json({
-      purchase_units: updatedPurchaseUnits
-    });
+    return res.status(200).json(updatedPurchaseUnits);
     
   } catch (error) {
     console.error('Error processing shipping callback:', error);
@@ -235,7 +233,7 @@ function getShippingOptions(firstPurchaseUnit){
       const { country_code } = firstPurchaseUnit.shipping.address;
   // Standard shipping
   options.push({
-    id: 'STANDARD',
+    id: '1',
     label: 'Standard Shipping (5-7 business days)',
     type: 'SHIPPING',
     selected: true, // First option is selected by default
@@ -247,7 +245,7 @@ function getShippingOptions(firstPurchaseUnit){
   
   // Express shipping
   options.push({
-    id: 'EXPRESS',
+    id: '2',
     label: 'Express Shipping (2-3 business days)',
     type: 'SHIPPING',
     selected: true,
@@ -260,7 +258,7 @@ function getShippingOptions(firstPurchaseUnit){
   // Overnight shipping (US only)
   if (country_code === 'US') {
     options.push({
-      id: 'OVERNIGHT',
+      id: '3',
       label: 'Overnight Shipping',
       type: 'SHIPPING',
       selected: false,

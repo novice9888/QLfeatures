@@ -113,14 +113,7 @@ console.log("inside contact and sssc route");
         "phone_number": {
            "country_code": "1",
            "national_number": "5555555555"
-         },
-        "address": {
-          "address_line_1": "123 Main St.",
-          "admin_area_2": "Anytown",
-          "admin_area_1": "CA",
-          "postal_code": "12345",
-          "country_code": "US"
-        }
+         }
       }
         }]
       })

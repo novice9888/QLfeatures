@@ -212,6 +212,9 @@ console.log("inside contact and sssc route");
       
       };
     });
+
+    console.log('Updated Purchase Units:');
+console.log(JSON.stringify(updatedPurchaseUnits, null, 2));
     
     // Return success response with updated order
     return res.status(200).json({

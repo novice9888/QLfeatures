@@ -184,8 +184,6 @@ console.log("inside contact and sssc route");
       const newTotal = (itemTotal + taxTotal + shippingCost).toFixed(2);
       
       return {
-        id: merchantId,
-        purchase_units : [{
           amount: {
           currency_code: unit.amount.currency_code,
           value: newTotal,
@@ -208,16 +206,17 @@ console.log("inside contact and sssc route");
         }
       },
        shipping_options :  shippingOptions // Same options for all units
-      }]
+      }
       
-      };
+      ;
     });
 
     console.log('Updated Purchase Units:');
 console.log(JSON.stringify(updatedPurchaseUnits, null, 2));
     
     // Return success response with updated order
-    return res.status(200).json(updatedPurchaseUnits);
+    return res.status(200).json({id: merchantId,  // Add the order ID
+  purchase_units: updatedPurchaseUnits});
     
   } catch (error) {
     console.error('Error processing shipping callback:', error);

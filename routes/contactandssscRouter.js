@@ -213,11 +213,19 @@ console.log("inside contact and sssc route");
 
     console.log('Updated Purchase Units:');
 console.log(JSON.stringify(updatedPurchaseUnits, null, 2));
-    
-    // Return success response with updated order
-    return res.status(200).json({id: merchantId,  // Add the order ID
-  purchase_units: updatedPurchaseUnits});
-    
+
+
+const callbackResponse = {
+  id: merchantId,  // Add the order ID
+  purchase_units: updatedPurchaseUnits
+};
+
+console.log('Callback Response:');
+console.log(JSON.stringify(callbackResponse, null, 2));
+
+// Return success response with updated order
+return res.status(200).json(callbackResponse);
+
   } catch (error) {
     console.error('Error processing shipping callback:', error);
     return res.status(500).json({
@@ -235,7 +243,7 @@ function getShippingOptions(firstPurchaseUnit){
     id: '1',
     label: 'Standard Shipping (5-7 business days)',
     type: 'SHIPPING',
-    selected: true, // First option is selected by default
+    selected: false, // First option is selected by default
     amount: {
       currency_code: currencyCode,
       value: calculateShippingCost('STANDARD', country_code, firstPurchaseUnit)

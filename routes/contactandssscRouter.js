@@ -81,7 +81,7 @@ console.log("inside contact and sssc route");
                 "return_url": "https://example.com/returnUrl",
                 "cancel_url": "https://example.com/cancelUrl",
                  "order_update_callback_config": {
-              "callback_events": ["SHIPPING_ADDRESS", "SHIPPING_OPTIONS"],
+              "callback_events": ["SHIPPING_ADDRESS"],
              "callback_url": "https://www.wenjuckts.de/test/xo_paynow/callback.php"
             }
             }
